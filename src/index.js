@@ -30,7 +30,7 @@ function init() {
   const loader = new THREE.TextureLoader();
 
   // Load the world map texture
-  loader.load("earth.jpg", function (texture) {
+  loader.load("earth-lg.jpg", function (texture) {
     // Create the sphere (globe)
     const sphereGeometry = new THREE.SphereGeometry(1, 32, 32);
 

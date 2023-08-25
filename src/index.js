@@ -129,8 +129,8 @@ function animate() {
   extractLatLngFromVertices(dodecahedron, uniqueVertices);
 
   for (let i = 0; i < vertexControllers.length; i++) {
-    vertexControllers[i].__controllers[0].setValue(vertexData.vertices[i].lat);
-    vertexControllers[i].__controllers[1].setValue(vertexData.vertices[i].lon);
+    vertexControllers[i].__controllers[0].setValue(vertexData.vertices[i].lat || 0);
+    vertexControllers[i].__controllers[1].setValue(vertexData.vertices[i].lon || 0);
   }
 
   renderer.render(scene, camera);

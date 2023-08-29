@@ -12,6 +12,7 @@ let scene,
   uniqueVertices,
   vertexData;
 
+  let relativeScale = 1 / 1;
 const vertexControllers = [];
 function init() {
   scene = new THREE.Scene();
@@ -47,7 +48,7 @@ function init() {
     dodecahedronGroup = new THREE.Group();
 
     // Dodecahedron solid faces
-    const dodecahedronGeometry = new THREE.DodecahedronGeometry(1);
+    const dodecahedronGeometry = new THREE.DodecahedronGeometry(0.8);
     const dodecahedronMaterial = new THREE.MeshBasicMaterial({
       color: 0xff0000,
     });
@@ -92,10 +93,19 @@ function init() {
     dodecahedronFolder
       .add(dodecahedronGroup.rotation, "z", 0, Math.PI * 2)
       .name("Rotation Z");
-    console.log(
-      "anything here?",
-      dodecahedron.geometry.attributes.position.array
-    );
+
+    dodecahedronFolder
+      .add(dodecahedronGroup.scale, "x", 0.1, 10)
+      .name("Scale")
+      .onChange(updateDodScale);
+
+      function updateDodScale() {
+        // if you want to keep the scaling uniform
+        relativeScale = dodecahedronGroup.scale.x / sphere.scale.x;
+        let scaleValue = dodecahedronGroup.scale.x;
+        dodecahedronGroup.scale.set(scaleValue, scaleValue, scaleValue);
+        
+      }
 
     uniqueVertices = getUniqueVertices(dodecahedron.geometry);
     vertexData = {
@@ -108,7 +118,7 @@ function init() {
       let controller = folder.addFolder(`Vertex ${i + 1}`);
       controller.add(vertexData.vertices[i], "lat").step(0.001).listen();
       controller.add(vertexData.vertices[i], "lon").step(0.001).listen();
-      controller.open()
+      controller.open();
       vertexControllers.push(controller);
     }
 
@@ -119,18 +129,25 @@ function init() {
 }
 
 function scaleObjects(size) {
-  sphere.scale.set(size, size, size);
-  dodecahedronGroup.scale.set(size, size, size);
+sphere.scale.set(size, size, size);
+
+// Update dodecahedronGroup scale based on ratio
+let newDodecahedronScale = size * relativeScale;
+dodecahedronGroup.scale.set(newDodecahedronScale, newDodecahedronScale, newDodecahedronScale);
+
 }
 
 function animate() {
   requestAnimationFrame(animate);
-
   extractLatLngFromVertices(dodecahedron, uniqueVertices);
 
   for (let i = 0; i < vertexControllers.length; i++) {
-    vertexControllers[i].__controllers[0].setValue(vertexData.vertices[i].lat || 0);
-    vertexControllers[i].__controllers[1].setValue(vertexData.vertices[i].lon || 0);
+    vertexControllers[i].__controllers[0].setValue(
+      vertexData.vertices[i].lat || 0
+    );
+    vertexControllers[i].__controllers[1].setValue(
+      vertexData.vertices[i].lon || 0
+    );
   }
 
   renderer.render(scene, camera);
